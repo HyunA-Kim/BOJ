@@ -1,66 +1,91 @@
 #include<iostream>
 #include<vector>
 #include<queue>
+#include<algorithm>
 
 using namespace std;
 
 int N, M;
-int dir[4][2] = { {-1,0},{1,0},{0,-1},{0,1} };
-int wall = 3;
+int dir[4][2] = { {-1,0},{1,0},{0,-1},{0,1} };	//방향
+int ans=0;
 
-vector<vector<int>> map;
-vector<vector<int>> map_visited;
-queue<pair<int,int>> q;
+vector<vector<int>> map;	//기존맵	
+vector<vector<int>> map_copy;	//맵 카피본
+vector<pair<int,int>> virus;
+queue<pair<int, int>> q;
 
-int map_check(int y, int x) {
+void count_empty() {
 	int num = 0;
-	for (int i = 0; i < 4; i++) {
-
-		int new_y = y + dir[i][0];
-		int new_x = x + dir[i][1];
-
-		if (new_y < 0 || new_y >= N || new_x < 0 || new_x >= M) continue;
-
-		if (map[new_y][new_x] == 0 && map_visited[new_y][new_x] == 0) {
-			num++;
-		}
-	}
-	return num;
-}
-
-void DFS(int y, int x) {
-
-	map_visited[y][x] = 1;
-	map[y][x] = 2;
-
-	int num = map_check(y, x);
-
-	if (wall - q.size() + 1 >= num) {
-
-		for (int i = 0; i < 4; i++) {
-
-			int new_y = y + dir[i][0];
-			int new_x = x + dir[i][1];
-
-			if (new_y < 0 || new_y >= N || new_x < 0 || new_x >= M) continue;
-
-			if (map[new_y][new_x] == 0 && map_visited[new_y][new_x] == 0) {
-				map[new_y][new_x] = 1;
-				map_visited[new_y][new_x] = 1;
-				wall--;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (map[i][j] == 0) {
+				num++;
 			}
 		}
 	}
-	else {
-		for (int i = 0; i < 4; i++) {
+	ans = max(ans, num);
+}
 
-			int new_y = y + dir[i][0];
-			int new_x = x + dir[i][1];
+void copy_recover() {
 
-			if (new_y < 0 || new_y >= N || new_x < 0 || new_x >= M) continue;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			map[i][j] = map_copy[i][j];
+		}
+	}
 
-			if (map[new_y][new_x] == 0 && map_visited[new_y][new_x] == 0) {
-				DFS(new_y, new_x);
+}
+
+void copy() {
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			map_copy[i][j] = map[i][j];
+		}
+	}
+}
+
+void wall(int cnt) {
+	
+	//벽을 다 세웠을 경우 (In case, built all of the wall)
+	//바이러스 퍼트리기 (spread virus)
+	if (cnt == 3) {
+		copy();
+		for (int a = 0; a < virus.size(); a++) {
+			q.push(virus[a]);
+		}
+
+		while (!q.empty()) {
+			int y = q.front().first;
+			int x = q.front().second;
+			
+			q.pop();
+
+			for (int i = 0; i < 4; i++) {
+				
+				int new_y = y + dir[i][0];
+				int new_x = x + dir[i][1];
+				
+				if (new_y < 0 || new_y >= N || new_x < 0 || new_x >= M) continue;
+
+				if (map[new_y][new_x] == 0) {
+					map[new_y][new_x] = 2;
+					q.push(make_pair(new_y, new_x));
+				}
+			}
+		}
+		count_empty();
+		copy_recover();
+		return;
+	}
+
+	//벽 세우기 경우의수 (모든 경우를 다 세는것으로 한다)
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (map[i][j] == 0) {
+				map[i][j] = 1;
+				wall(cnt + 1);	//벽을 하나더 증가시켜줌
+				map[i][j] = 0;	//다른 곳에 벽세우기 위한 기존 벽 초기화
 			}
 		}
 	}
@@ -71,36 +96,26 @@ int main(void) {
 	cin >> N >> M;
 
 	map.assign(N, vector<int>(M, 0));
-	map_visited.assign(N, vector<int>(M, 0));
+	map_copy.assign(N, vector<int>(M, 0));
 
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
 			cin >> map[i][j];
 			if (map[i][j] == 2) {
-				q.push(make_pair(i, j));
+				virus.push_back(make_pair(i, j));	//바이러스 해당좌표 입력
 			}
-			else if (map[i][j] == 1) {
-				map_visited[i][j] = 1;
-			}
-
 		}
 	}
 
-	while(!q.empty()){
-		int y = q.front().first;
-		int x = q.front().second;
-		DFS(y, x);
-		q.pop();
-	}
-
-	int cnt = 0;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
-			cout << map[i][j] << " ";
-			if (map[i][j] == 0) cnt++;
+			if (map[i][j] == 0) {
+				map[i][j] = 1;
+				wall(1);
+				map[i][j] = 0;
+			}
 		}
-		cout << endl;
 	}
 
-	cout << cnt;
+	cout << ans;
 }
