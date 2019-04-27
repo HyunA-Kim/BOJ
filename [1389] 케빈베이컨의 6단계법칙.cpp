@@ -1,66 +1,71 @@
 #include<iostream>
 #include<vector>
-#include<stack>
 
 using namespace std;
 
 int N, M;
-int min_count=100000;	//최소 방문횟수
+int MAX = 100000;
+int min_count = 100000;	//최소 방문횟수
 int man_num=0;
 
 vector<vector<int>> map;
 
-void DFS(int A) {
+void Distance() {
 	
-	vector<int>isVisited;
-	stack<int> s;
+	// Floyd-Warshall Algorithm(플로이드-워셜 알고리즘)
 
-	isVisited.assign(N, 0);
-	s.push(A);	//해당 좌표를 stack에 입력
-
-	while (!s.empty()) {
-		int k = s.top();
-		s.pop();
-		for (int i = 0; i < N; i++) {
-			if (i == A) continue;
-			if (map[k][i] == 1 && isVisited[i]== 0 ) {
-				isVisited[i] = isVisited[k] + 1;	//깊이를 계산하기 위해 전 방문노드의 수에서 더함
-				s.push(i);	
+	//거쳐가는 정점
+	for (int k = 0; k < N; ++k) {
+		//출발하는 정점
+		for (int i = 0; i < N; ++i) {
+			//도착하는 정점
+			for (int j = 0; j < N; ++j) {
+				//최단거리 구하기
+				if (map[i][k] + map[k][j] < map[i][j])
+					map[i][j] = map[i][k] + map[k][j];
 			}
 		}
 	}
 	
-	int cnt = 0;
+	//최소한으로의 거리를 가진 사람구하기(find smaller distance)
 	for (int i = 0; i < N; i++) {
-		cnt += isVisited[i];	//방문횟수 더하기
-	}
-
-	//서로간의 방문횟수 비교 및 저장
-	if (min_count > cnt) {
-		man_num = A;
-		min_count = cnt;
+		int temp = 0;
+		for (int j = 0; j < N; j++) {
+			temp += map[i][j];
+		}
+		//최소값보다 작을 갱신(when value is the smallest, update)
+		if (temp < min_count) {
+			min_count = temp;
+			man_num = i + 1;
+		}
 	}
 }
 
 int main(void) {
 	
-	int man_number=0;
 	int A, B;
 
 	cin >> N >> M;
 
 	map.assign(N, vector<int>(N, 0));
 
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			//같은정점 빼고는, 최대값으로 만들기
+			map[i][j] = i == j ? 0 : MAX;
+		}
+	}
+
 	for (int i = 0; i < M; i++) {
 		cin >> A >> B;
+		//연결된 선 1로 업데이트(when connected, update 1)
 		map[A-1][B-1] = 1;
 		map[B-1][A-1] = 1;
 	}
 
-	for (int i = 0; i < N; i++) {
-		DFS(i);	//각각 방문횟수를 카운트하기 위한 함수
-	}
+	//연결간선 구하기(find distance over dot to dot)
+	Distance();
 
-	cout << man_num+1;	//가장 작은 방문횟수 가지고 있는 사람 출력
+	cout << man_num;	//가장 작은 방문횟수 가지고 있는 사람 출력
 	return 0;
 }
