@@ -1,30 +1,39 @@
 #include<iostream>
 #include<vector>
+#include<queue>
 
 using namespace std;
 
 int n;
 int goal_x, goal_y;
 int m;
-int cnt = 0; //ÃÌ¼ö
+int depth[101];	//ì´Œìˆ˜ë¥¼ ê³„ì‚°í•´ì¤„ ë°°ì—´
 
-vector<int> map[101];
-vector<int> map_visited[101];
+vector<vector<int>> map;
+vector<int> map_visited;
+queue<int> q;
 
-void Relative(int root) {
+void Relative(int goal_x) {
 
-	for (int i = 0; i < n; i++) {
+	map_visited[goal_x] = 1;	//í•´ë‹¹ ë²ˆí˜¸ë¥¼ ë°©ë¬¸í‘œì‹œ
 	
-		if (map[i].size() == 0) continue;
+	q.push(goal_x);
+	depth[goal_x] = 0;	//ì´Œìˆ˜ ê³„ì‚° ì‹œì‘
+	
+	while(!q.empty()) {
+
+		int value = q.front();
+		q.pop();
 		
-		for (int j = 0; j < map[i].size(); j++) {
-		
-			if (map[i][j] == root) {
-				// ÇØ´ç ¹øÈ£¸¦ Ã£¾ÒÀ» ½Ã, ±×°÷¿¡¼­ ºÎÅÍ ½ÇÇà
-				// 1. À§·Î ¿Ã¶ó°¡´Â ¹æ¹ı -> ¿Ã¶ó°¡¸é¼­ cnt+1 ½ÃÇà
-				// 2. ¾Æ·¡·Î ³»·Á°¡´Â ¹æ¹ı -> ¾Æ·¡·Î ³»·Á°¡¸é¼­ cnt+1 ½ÃÇà
+		for (int j = 1; j <= n; j++) {
+
+			if (map[value][j] == 1 && !map_visited[j]) {
+				q.push(j);
+				map_visited[j] = 1;
+				depth[j] = depth[value] + 1;	//ë°©ë¬¸ì‹œ, ì´Œìˆ˜ë¥¼ 1 ëŠ˜ë¦¼
 			}
 		}
+
 	}
 }
 
@@ -34,11 +43,19 @@ int main(void) {
 	cin >> goal_x >> goal_y;
 	cin >> m;
 
+	map.assign(n+1, vector<int>(n+1, 0));
+	map_visited.assign(101, 0);
+
 	for (int i = 0; i < m; i++) {
 		int x, y;
 		cin >> x >> y;
-		map[x].push_back(y);
+		map[x][y] = 1;	//ì„œë¡œê°„ì˜ ë¶€ëª¨ ì—¬ë¶€ë¥¼ ì²´í¬
+		map[y][x] = 1;
 	}
 
-	Relative(goal_x);
+	Relative(goal_x);	//Relative í•¨ìˆ˜ë¥¼ ì´ìš©í•´ ì´Œìˆ˜ í™•ì¸ì‹œì‘
+	
+	//ì—°ê´€ì—†ì„ì‹œ -1 ì¶œë ¥
+	if (depth[goal_y] == 0) cout << -1;
+	else cout << depth[goal_y];
 }
