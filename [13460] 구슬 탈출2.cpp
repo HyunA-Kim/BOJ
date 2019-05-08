@@ -16,18 +16,16 @@ pair<int, int> b;
 
 bool check() {
 
-	r.first = q.front().first.first;
-	r.second = q.front().first.second;
 	int count = q.front().second;
 	
-	//ÆÄ¶õ±¸½½ÀÌ µé¾î°¬À» °æ¿ì || ÆÄ¶õ,»¡°­±¸½½ µ¿½Ã¿¡ µé¾î°¬À» °æ¿ì
+	//íŒŒë€êµ¬ìŠ¬ì´ ë“¤ì–´ê°”ì„ ê²½ìš° || íŒŒë€,ë¹¨ê°•êµ¬ìŠ¬ ë™ì‹œì— ë“¤ì–´ê°”ì„ ê²½ìš°
 	if (b.first == goal.first && b.second == goal.second) {
 		cout << -1;
 		return true;
 	}
-	//»¡°£±¸½½ÀÌ µé¾î°¬À» °æ¿ì
+	//ë¹¨ê°„êµ¬ìŠ¬ì´ ë“¤ì–´ê°”ì„ ê²½ìš°
 	else if (r.first == goal.first && r.second == goal.second) {
-		//10ÃÊ°úÀÏ¶§ ½ÇÆĞ
+		//10ì´ˆê³¼ì¼ë•Œ ì‹¤íŒ¨
 		if (count > 10) cout << -1;
 		else cout << count;
 		return true;
@@ -45,74 +43,83 @@ void BFS() {
 		r.second = q.front().first.second;
 		int count = q.front().second;
 
-		//»óÇÏÁÂ¿ì·Î Èçµé±â
+		//ìƒí•˜ì¢Œìš°ë¡œ í”ë“¤ê¸°
 		for (int k = 0; k < 4; k++) {
-			//»ó
+			//ìƒ
 			if (dir[k] == 'N') {
+
 				while (1) {
-					if (map[r.first][r.second] == '#' || map_visited[r.first-1][r.second] != 0) break;
+					if (map[r.first-1][r.second] == '#' || map_visited[r.first-1][r.second] != 0 ) break;
+					map[r.first][r.second] = '.';
 					r.first -= 1;
+					map[r.first][r.second] = 'R';
 					map_visited[r.first][r.second] = 1;
 					if (check() == true) exit;
 				}
-				r.first += 1;
 				while (1) {
-					if (map[b.first][b.second] == '#') break;
+					if (map[b.first-1][b.second] == '#') break;
+					map[b.first][b.second] = '.';
 					b.first -= 1;
+					map[b.first][b.second] = 'B';
 					if (check() == true) exit;
 				}
-				b.first += 1;
 			}
-			//¿ì
+			//ìš°
 			else if (dir[k] == 'E') {
 				while (1) {
-					if (map[r.first][r.second] == '#' || map_visited[r.first][r.second+1] != 0) break;
+					if (map[r.first][r.second+1] == '#' || map_visited[r.first][r.second+1] != 0) break;
+					map[r.first][r.second] = '.';
 					r.second += 1;
+					map[r.first][r.second] = 'R';
 					map_visited[r.first][r.second] = 1;
 					if (check() == true) exit;
 				}
-				r.second -= 1;
 				while (1) {
-					if (map[b.first][b.second] == '#') break;
+					if (map[b.first][b.second+1] == '#') break;
+					map[b.first][b.second] = '.';
 					b.second += 1;
+					map[b.first][b.second] = 'B';
 					if (check() == true) exit;
 				}
-				b.second -= 1;
 			}
-			//ÇÏ
+			//í•˜
 			else if (dir[k] == 'S') {
 				while (1) {
-					if (map[r.first][r.second] == '#' || map_visited[r.first+1][r.second] != 0) break;
+					if (map[r.first+1][r.second] == '#' || map_visited[r.first+1][r.second] != 0) break;
+					map[r.first][r.second] = '.';
 					r.first += 1;
+					map[r.first][r.second] = 'R';
 					map_visited[r.first][r.second] = 1;
 					if (check() == true) exit;
 				}
-				r.first -= 1;
 				while (1) {
-					if (map[b.first][b.second] == '#') break;
+					if (map[b.first+1][b.second] == '#') break;
+					map[b.first][b.second] = '.';
 					b.first += 1;
+					map[b.first][b.second] = 'B';
 					if (check() == true) exit;
 				}
-				b.first -= 1;
 			}
-			//ÁÂ
+			//ì¢Œ
 			else if (dir[k] == 'W') {
 				while (1) {
-					if (map[r.first][r.second] == '#' || map_visited[r.first][r.second-1] != 0) break;
+					if (map[r.first][r.second-1] == '#' || map_visited[r.first][r.second-1] != 0) break;
+					map[r.first][r.second] = '.';
 					r.second -= 1;
+					map[r.first][r.second] = 'R';
 					map_visited[r.first][r.second] = 1;
 					if (check() == true) exit;
 				}
-				r.second += 1;
 				while (1) {
-					if (map[b.first][b.second] == '#') break;
+					if (map[b.first][b.second-1] == '#') break;
+					map[b.first][b.second] = '.';
 					b.second -= 1;
+					map[b.first][b.second] = 'B';
 					if (check() == true) exit;
 				}
-				b.second += 1;
 			}
 
-			//¾î¶»°Ô ¿òÁ÷ÀÌ´Â È®ÀÎÇÏ´Â ÄÚµå
+			//ì–´ë–»ê²Œ ì›€ì§ì´ëŠ” í™•ì¸í•˜ëŠ” ì½”ë“œ
 			for (int i = 0; i < N; i++) {
 				for (int j = 0; j < M; j++) {
 					cout << map[i][j] << " ";
@@ -135,7 +142,13 @@ int main(void) {
 		for (int j = 0; j < M; j++) {
 			cin >> map[i][j];
 			if (map[i][j] == 'R') {
+				r.first = i;
+				r.second = j;
 				q.push(make_pair(make_pair(i, j),0));
+			}
+			else if (map[i][j] == 'B') {
+				b.first = i;
+				b.second = j;
 			}
 			else if (map[i][j] == 'O') {
 				goal.first = i;
