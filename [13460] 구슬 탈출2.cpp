@@ -5,130 +5,113 @@
 using namespace std;
 
 int N, M;
-int ans;
-char dir[4] = { 'N','E','S','W'};
+int ans = 0;
+int dir[4][2] = { {-1,0},{1,0},{0,-1},{0,1} };
 
 vector<vector<char>> map;
-queue<pair<pair<int, int>,int>> q;
+
+vector<vector<int>> rq_visited;
+vector<vector<int>> bq_visited;
+
+queue<pair<int,int>> rq;
+queue<pair<int, int>> bq;
+
 pair<int, int> goal;
 pair<int, int> r;
 pair<int, int> b;
 
-bool check() {
-
-	int count = q.front().second;
-	
-	//파란구슬이 들어갔을 경우 || 파란,빨강구슬 동시에 들어갔을 경우
-	if (b.first == goal.first && b.second == goal.second) {
-		cout << -1;
-		return true;
-	}
-	//빨간구슬이 들어갔을 경우
-	else if (r.first == goal.first && r.second == goal.second) {
-		//10초과일때 실패
-		if (count > 10) cout << -1;
-		else cout << count;
-		return true;
-	}
-}
-
 void BFS() {
+	while (rq.size()) {
+		int size = rq.size();
+		while (size--) {
+			r.first = rq.front().first;
+			r.second = rq.front().second;
+			b.first = bq.front().first;
+			b.second = bq.front().second;
+			rq.pop();
+			bq.pop();
 
-	vector<vector<int>> map_visited;
-	map_visited.assign(N, vector<int>(N, 0));
-
-	while (!q.empty()) {
-
-		r.first = q.front().first.first;
-		r.second = q.front().first.second;
-		int count = q.front().second;
-
-		//상하좌우로 흔들기
-		for (int k = 0; k < 4; k++) {
-			//상
-			if (dir[k] == 'N') {
-
-				while (1) {
-					if (map[r.first-1][r.second] == '#' || map_visited[r.first-1][r.second] != 0 ) break;
-					map[r.first][r.second] = '.';
-					r.first -= 1;
-					map[r.first][r.second] = 'R';
-					map_visited[r.first][r.second] = 1;
-					if (check() == true) exit;
-				}
-				while (1) {
-					if (map[b.first-1][b.second] == '#') break;
-					map[b.first][b.second] = '.';
-					b.first -= 1;
-					map[b.first][b.second] = 'B';
-					if (check() == true) exit;
-				}
+			if (r == goal && r == b) {
+				cout << -1;
+				return;
 			}
-			//우
-			else if (dir[k] == 'E') {
-				while (1) {
-					if (map[r.first][r.second+1] == '#' || map_visited[r.first][r.second+1] != 0) break;
-					map[r.first][r.second] = '.';
-					r.second += 1;
-					map[r.first][r.second] = 'R';
-					map_visited[r.first][r.second] = 1;
-					if (check() == true) exit;
+			else if (r == goal && r != b) {
+				if (ans >= 10) {
+					cout << -1;
 				}
-				while (1) {
-					if (map[b.first][b.second+1] == '#') break;
-					map[b.first][b.second] = '.';
-					b.second += 1;
-					map[b.first][b.second] = 'B';
-					if (check() == true) exit;
+				else {
+					cout << ans;
 				}
-			}
-			//하
-			else if (dir[k] == 'S') {
-				while (1) {
-					if (map[r.first+1][r.second] == '#' || map_visited[r.first+1][r.second] != 0) break;
-					map[r.first][r.second] = '.';
-					r.first += 1;
-					map[r.first][r.second] = 'R';
-					map_visited[r.first][r.second] = 1;
-					if (check() == true) exit;
-				}
-				while (1) {
-					if (map[b.first+1][b.second] == '#') break;
-					map[b.first][b.second] = '.';
-					b.first += 1;
-					map[b.first][b.second] = 'B';
-					if (check() == true) exit;
-				}
-			}
-			//좌
-			else if (dir[k] == 'W') {
-				while (1) {
-					if (map[r.first][r.second-1] == '#' || map_visited[r.first][r.second-1] != 0) break;
-					map[r.first][r.second] = '.';
-					r.second -= 1;
-					map[r.first][r.second] = 'R';
-					map_visited[r.first][r.second] = 1;
-					if (check() == true) exit;
-				}
-				while (1) {
-					if (map[b.first][b.second-1] == '#') break;
-					map[b.first][b.second] = '.';
-					b.second -= 1;
-					map[b.first][b.second] = 'B';
-					if (check() == true) exit;
-				}
+				return;
 			}
 
-			//어떻게 움직이는 확인하는 코드
-			for (int i = 0; i < N; i++) {
-				for (int j = 0; j < M; j++) {
-					cout << map[i][j] << " ";
-				}
-				cout << endl;
-			}
-			q.pop();
-			q.push(make_pair(make_pair(r.first, r.second), count + 1));
+			for (int k = 0; k < 4; k++) {
 
+				pair<int, int> new_r = { r.first,r.second };
+				pair<int, int> new_b = { b.first,b.second };
+
+				while (1) {
+					if (map[new_r.first + dir[k][0]][new_r.second + dir[k][1]] == '#') break;
+					if (new_r.first == goal.first && new_r.second == goal.second) break;
+					new_r.first += dir[k][0];
+					new_r.second += dir[k][1];
+				}
+
+				while (1) {
+					if (map[new_b.first + dir[k][0]][new_b.second + dir[k][1]] == '#') break;
+					if (new_b.first == goal.first && new_b.second == goal.second) break;
+					new_b.first += dir[k][0];
+					new_b.second += dir[k][1];
+				}
+
+				if (new_r == new_b && new_r != goal) {
+					//열이다른경우
+					if (r.first == b.first) {
+						if (r.second > b.second) {
+							if (k == 2) new_r.second += 1;
+							if (k == 3) new_b.second -= 1;
+						}
+						else {
+							if (k == 2) new_b.second += 1;
+							if (k == 3) new_r.second -= 1;
+						}
+					}
+					//행이 다른경우
+					else if (r.second == b.second) {
+						if (r.first > b.first) {
+							if (k == 0) new_r.second += 1;
+							if (k == 1) new_b.second -= 1;
+						}
+						else {
+							if (k == 0) new_b.second += 1;
+							if (k == 1) new_r.second -= 1;
+						}
+					}
+				}
+
+				if (new_r == goal || new_b == goal) continue;
+				if (bq_visited[new_b.first][new_b.second] == 1 && rq_visited[new_r.first][new_r.second] == 1) continue;
+
+				rq_visited[new_r.first][new_r.second] = 1;
+				bq_visited[new_b.first][new_b.second] = 1;
+
+				map[r.first][r.second] = '.';
+				map[b.first][b.second] = '.';
+				map[new_r.first][new_r.second] = 'R';
+				map[new_b.first][new_b.second] = 'B';
+
+
+				rq.push(make_pair(new_r.first, new_r.second));
+				bq.push(make_pair(new_b.first, new_b.second));
+
+				for (int i = 0; i < N; i++) {
+					for (int j = 0; j < M; j++) {
+						cout << map[i][j] << " ";
+					}
+					cout << endl;
+				}
+			}
+			ans++;
 		}
 	}
 }
@@ -138,13 +121,15 @@ int main(void) {
 	cin >> N >> M;
 	map.assign(N, vector<char>(M, '.'));
 
+	rq_visited.assign(N, vector<int>(M, 0));
+	bq_visited.assign(N, vector<int>(M, 0));
+
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
 			cin >> map[i][j];
 			if (map[i][j] == 'R') {
 				r.first = i;
 				r.second = j;
-				q.push(make_pair(make_pair(i, j),0));
 			}
 			else if (map[i][j] == 'B') {
 				b.first = i;
@@ -157,6 +142,8 @@ int main(void) {
 		}
 	}
 
+	rq.push(make_pair(r.first, r.second));
+	bq.push(make_pair(b.first, b.second));
+
 	BFS();
-	
 }
