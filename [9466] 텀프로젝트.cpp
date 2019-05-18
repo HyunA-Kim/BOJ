@@ -11,35 +11,27 @@ vector<int> map_visited;
 stack<int> s;
 
 void DFS(int i,int goal) {
+
+	if (i == goal) map_visited[i] = 1;
 	
+	if (map_visited[i] == 1) {
 
-	if (map_visited[i] == 1) return;
+		if (goal != i) return;
+		
+		while (!s.empty()) {
+			int k = s.top();
+			s.pop();
+			map_visited[k] = 0;
+		}
+		return;
+	
+	}
 
+	map_visited[i] = 1;
 	int k = map[i];
-
-	if (k == i) {
-		map_visited[i] = 1;
-		while (!s.empty()) {
-			int num = s.top();
-			s.pop();
-			map_visited[num] = 0;
-		}
-		return;
-	}
+	s.push(k);
+	DFS(k,goal);
 	
-	if (k == goal) {
-		while (!s.empty()) {
-			int num = s.top();
-			s.pop();
-			map_visited[num] = 1;
-		}
-		return;
-	}
-	else if (map_visited[k] == 1) return;
-	else {
-		s.push(k);
-		DFS(k,goal);
-	}
 }
 
 int main(void) {
