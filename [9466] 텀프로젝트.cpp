@@ -12,26 +12,22 @@ stack<int> s;
 
 void DFS(int i,int goal) {
 
-	if (i == goal) map_visited[i] = 1;
-	
-	if (map_visited[i] == 1) {
-
-		if (goal != i) return;
-		
+	if (map[i] == i) {
 		while (!s.empty()) {
 			int k = s.top();
 			s.pop();
 			map_visited[k] = 0;
 		}
+		map_visited[i] = 1;
 		return;
-	
 	}
+	
+	if (map_visited[i] == 1) return;
 
 	map_visited[i] = 1;
 	int k = map[i];
-	s.push(k);
+	s.push(i);
 	DFS(k,goal);
-	
 }
 
 int main(void) {
@@ -50,7 +46,6 @@ int main(void) {
 		}
 
 		for (int i = 1; i <= N; i++) {
-			if (map_visited[i] !=-1) continue;
 			DFS(i, i);
 		}
 
