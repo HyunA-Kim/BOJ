@@ -37,6 +37,7 @@ int main(void) {
 
 	while (T--) {
 		cin >> N;
+		
 
 		map.assign(N+1, 0);
 		map_visited.assign(N + 1, 0);
