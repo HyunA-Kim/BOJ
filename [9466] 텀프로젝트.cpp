@@ -12,22 +12,43 @@ stack<int> s;
 
 void DFS(int i,int goal) {
 
-	if (map[i] == i) {
-		while (!s.empty()) {
+	//if (map[i] == i) {
+	//	while (!s.empty()) {
+	//		int k = s.top();
+	//		s.pop();
+	//		map_visited[k] = 0;
+	//	}
+	//	map_visited[i] = 1;
+	//	return;
+	//}
+
+	if (map_visited[i] == 1 ) {
+		if (s.empty()) {
+			map_visited[i] = 1;
+		}
+		else {
 			int k = s.top();
 			s.pop();
-			map_visited[k] = 0;
-		}
-		map_visited[i] = 1;
-		return;
-	}
-	
-	if (map_visited[i] == 1) return;
+			while (!s.empty()) {
+				int z = s.top();
+				s.pop();
+				if (k == z) break;
+			}
 
+			while (!s.empty()) {
+				int z = s.top();
+				s.pop();
+				map_visited[z] = 0;
+			}
+		}
+		return;
+
+	}	
 	map_visited[i] = 1;
 	int k = map[i];
 	s.push(i);
 	DFS(k,goal);
+
 }
 
 int main(void) {
@@ -37,7 +58,6 @@ int main(void) {
 
 	while (T--) {
 		cin >> N;
-		
 
 		map.assign(N+1, 0);
 		map_visited.assign(N + 1, 0);
