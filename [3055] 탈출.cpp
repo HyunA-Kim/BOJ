@@ -25,34 +25,35 @@ void BFS() {
 		biber.pop();
 		water.pop();
 		
-		for (int i = 0; i < R; i++) {
+		/*for (int i = 0; i < R; i++) {
 			for (int j = 0; j < C; j++) {
 				cout << map[i][j] << " ";
 			}
 			cout << endl;
-		}
+		}*/
 
 		for (int i = 0; i < 4; i++) {
 			pair<int, int> new_man_move = { man_move.first + dir[i][0],man_move.second + dir[i][1] };
 			pair<int, int> new_water_move = { water_move.first + dir[i][0], water_move.second + dir[i][1] }; 
 			if (new_man_move.first<0 || new_man_move.first>=R || new_man_move.second < 0 || new_man_move.second >= C) continue;
-			if (new_water_move.first < 0 || new_water_move.first >= R || new_water_move.second < 0 || new_water_move.second >= C) continue;
-			
+			if (map[new_man_move.first][new_man_move.second] == '.' && map_visited[new_man_move.first][new_man_move.second] == 0) {
+				biber.push({ new_man_move,cnt+1});
+				map_visited[new_man_move.first][new_man_move.second] = 1;
+			}//ë¬¼ì´ ë“¤ì–´ì˜¬ ì˜ˆì •ì¸ì¹¸ ì²˜ë¦¬ í•„ìš”
 			if (new_man_move == cave) {
-				cout << cnt;
+				cout << cnt+1;
 				return;
 			}
 
+			if (new_water_move.first < 0 || new_water_move.first >= R || new_water_move.second < 0 || new_water_move.second >= C) continue;
 			if (map[new_water_move.first][new_water_move.second] == '.' || map_visited[new_water_move.first][new_water_move.second] == 0) {
 				water.push(new_water_move);
 				map_visited[new_water_move.first][new_water_move.second] = 1;
 				map[new_water_move.first][new_water_move.second] = '*';
 			}
-			if (map[new_man_move.first][new_man_move.second] == '.' && map_visited[new_man_move.first][new_man_move.second] == 0) {
-				biber.push({ new_man_move,man_move.second });
-				map_visited[new_man_move.first][new_man_move.second] = 1;
-				map[new_man_move.first][new_man_move.second] = 'D';
-			}//¹°ÀÌ µé¾î¿Ã ¿¹Á¤ÀÎÄ­ Ã³¸® ÇÊ¿ä
+			
+			
+			
 		}
 	}
 
