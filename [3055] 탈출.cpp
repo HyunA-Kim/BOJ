@@ -16,6 +16,8 @@ queue<pair<int, int>> water;
 queue<pair<pair<int, int>,int>> biber;
 
 void BFS() {
+	
+	bool expect_waterbound = false;
 
 	while (!biber.empty()) {
 
@@ -24,29 +26,42 @@ void BFS() {
 		pair<int, int> water_move = water.front();
 		biber.pop();
 		water.pop();
-		
-		/*for (int i = 0; i < R; i++) {
+
+		if (man_move == cave) {
+			cout << cnt + 1;
+			return;
+		}
+
+		for (int i = 0; i < R; i++) {
 			for (int j = 0; j < C; j++) {
 				cout << map[i][j] << " ";
 			}
 			cout << endl;
-		}*/
+		}
 
 		for (int i = 0; i < 4; i++) {
 			pair<int, int> new_man_move = { man_move.first + dir[i][0],man_move.second + dir[i][1] };
 			pair<int, int> new_water_move = { water_move.first + dir[i][0], water_move.second + dir[i][1] }; 
+		
 			if (new_man_move.first<0 || new_man_move.first>=R || new_man_move.second < 0 || new_man_move.second >= C) continue;
-			if (map[new_man_move.first][new_man_move.second] == '.' && map_visited[new_man_move.first][new_man_move.second] == 0) {
-				biber.push({ new_man_move,cnt+1});
-				map_visited[new_man_move.first][new_man_move.second] = 1;
-			}//물이 들어올 예정인칸 처리 필요
-			if (new_man_move == cave) {
-				cout << cnt+1;
-				return;
+			else if (new_water_move.first < 0 || new_water_move.first >= R || new_water_move.second < 0 || new_water_move.second >= C) continue;
+
+			//물이 들어올 예정인 칸 처리할 수 있는 로직 구현
+			expect_waterbound = false;
+			for (int i = 0; i < 4; i++) {
+				if ((new_man_move.first == water_move.first + dir[i][0]) && (new_man_move.second == water_move.second + dir[i][1]))
+				{
+					expect_waterbound = true;
+					break;
+				}
 			}
 
-			if (new_water_move.first < 0 || new_water_move.first >= R || new_water_move.second < 0 || new_water_move.second >= C) continue;
-			if (map[new_water_move.first][new_water_move.second] == '.' || map_visited[new_water_move.first][new_water_move.second] == 0) {
+			if (map[new_man_move.first][new_man_move.second] == '.' && map_visited[new_man_move.first][new_man_move.second] == 0 && expect_waterbound==false) {
+				biber.push({ new_man_move,cnt+1});
+				map_visited[new_man_move.first][new_man_move.second] = 1;
+			}
+
+			if (map[new_water_move.first][new_water_move.second] == '.' && map_visited[new_water_move.first][new_water_move.second] == 0) {
 				water.push(new_water_move);
 				map_visited[new_water_move.first][new_water_move.second] = 1;
 				map[new_water_move.first][new_water_move.second] = '*';
@@ -63,8 +78,8 @@ void BFS() {
 int main(void) {
 
 	cin >> R >> C;
-	map.assign(R, vector<char>(C, 0));
-	map_visited.assign(R, vector<char>(C, 0));
+	map.assign(R+1, vector<char>(C+1, 0));
+	map_visited.assign(R+1, vector<char>(C+1, 0));
 
 	for (int i = 0; i < R; i++) {
 		for (int j = 0; j < C; j++) {
@@ -83,4 +98,5 @@ int main(void) {
 	}
 
 	BFS();
+	return 0;
 }
