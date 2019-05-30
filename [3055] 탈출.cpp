@@ -27,10 +27,7 @@ void BFS() {
 		biber.pop();
 		water.pop();
 
-		if (man_move == cave) {
-			cout << cnt + 1;
-			return;
-		}
+	
 
 		for (int i = 0; i < R; i++) {
 			for (int j = 0; j < C; j++) {
@@ -46,7 +43,7 @@ void BFS() {
 			if (new_man_move.first<0 || new_man_move.first>=R || new_man_move.second < 0 || new_man_move.second >= C) continue;
 			else if (new_water_move.first < 0 || new_water_move.first >= R || new_water_move.second < 0 || new_water_move.second >= C) continue;
 
-			//물이 들어올 예정인 칸 처리할 수 있는 로직 구현
+			//물이 들어올 예정인칸 처리할 수 있는 로직 구현
 			expect_waterbound = false;
 			for (int i = 0; i < 4; i++) {
 				if ((new_man_move.first == water_move.first + dir[i][0]) && (new_man_move.second == water_move.second + dir[i][1]))
@@ -59,6 +56,11 @@ void BFS() {
 			if (map[new_man_move.first][new_man_move.second] == '.' && map_visited[new_man_move.first][new_man_move.second] == 0 && expect_waterbound==false) {
 				biber.push({ new_man_move,cnt+1});
 				map_visited[new_man_move.first][new_man_move.second] = 1;
+			}
+			
+			if (new_man_move == cave) {
+			cout << cnt + 1;
+			return;
 			}
 
 			if (map[new_water_move.first][new_water_move.second] == '.' && map_visited[new_water_move.first][new_water_move.second] == 0) {
