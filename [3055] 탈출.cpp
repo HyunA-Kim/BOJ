@@ -37,10 +37,6 @@ void BFS() {
 			isWater = true;
 		}
 
-		if (man_move == cave) {
-			cout << cnt + 1;
-			return;
-		}
 
 		for (int i = 0; i < R; i++) {
 			for (int j = 0; j < C; j++) {
@@ -48,10 +44,8 @@ void BFS() {
 			}
 			cout << endl;
 		}
-
+	
 		for (int i = 0; i < 4; i++) {
-
-			pair<int, int> new_man_move = { man_move.first + dir[i][0],man_move.second + dir[i][1] };
 			pair<int, int> new_water_move;
 			if (isWater == false) {
 				new_water_move = { water_move.first + dir[i][0], water_move.second + dir[i][1] };
@@ -59,35 +53,43 @@ void BFS() {
 			else {
 				new_water_move = { NULL,NULL };
 			}
+			if (new_water_move.first < 0 || new_water_move.first >= R || new_water_move.second < 0 || new_water_move.second >= C) continue;
+			if (isWater == false && map[new_water_move.first][new_water_move.second] == '.') {
+				water.push(new_water_move);
+				map_visited[new_water_move.first][new_water_move.second] = 1;
+				map[new_water_move.first][new_water_move.second] = '*';
+			}
+		}
 
-			if (new_man_move.first<0 || new_man_move.first>=R || new_man_move.second < 0 || new_man_move.second >= C) continue;
-			else if (new_water_move.first < 0 || new_water_move.first >= R || new_water_move.second < 0 || new_water_move.second >= C) continue;
-			else {
-				//물이 들어올 예정인칸 처리할 수 있는 로직 구현
-				expect_waterbound = false;
-				if (isWater == false) {
-					for (int z = 0; z < 4; z++) {
-						if ((new_man_move.first == water_move.first + dir[z][0]) && (new_man_move.second == water_move.second + dir[z][1]))
-						{
-							expect_waterbound = true;
-							break;
-						}
+
+		for (int i = 0; i < 4; i++) {
+
+			pair<int, int> new_man_move = { man_move.first + dir[i][0],man_move.second + dir[i][1] };
+			pair<int, int> new_water_move = { water.front().first,water.front().second };
+			if (new_man_move.first < 0 || new_man_move.first >= R || new_man_move.second < 0 || new_man_move.second >= C) continue;
+			//물이 들어올 예정인칸 처리할 수 있는 로직 구현
+			expect_waterbound = false;
+			if (isWater == false) {
+				for (int z = 0; z < 4; z++) {
+					if ((new_man_move.first == new_water_move.first + dir[z][0]) && (new_man_move.second == new_water_move.second + dir[z][1]))
+					{
+						expect_waterbound = true;
+						break;
 					}
 				}
-				if (map[new_man_move.first][new_man_move.second] == '.' && map_visited[new_man_move.first][new_man_move.second] == 0 && expect_waterbound == false) {
-					biber.push({ new_man_move,cnt + 1 });
-					map_visited[new_man_move.first][new_man_move.second] = 1;
-				}
-
-				if (isWater==false && map[new_water_move.first][new_water_move.second] == '.' && map_visited[new_water_move.first][new_water_move.second] == 0) {
-					water.push(new_water_move);
-					map_visited[new_water_move.first][new_water_move.second] = 1;
-					map[new_water_move.first][new_water_move.second] = '*';
-				}
-
 			}
-			
+			if (map[new_man_move.first][new_man_move.second] == '.'&& expect_waterbound == false) {
+				biber.push({ new_man_move,cnt + 1 });
+				map_visited[new_man_move.first][new_man_move.second] = 1;
+			}
+			if (cave == new_man_move) {
+				cout << cnt + 1;
+				return;
+			}
 		}
+
+		
+		
 	}
 
 	cout << "KAKTUS";
