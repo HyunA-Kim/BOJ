@@ -18,7 +18,6 @@ queue<pair<pair<int, int>,int>> biber;
 void BFS() {
 	
 	bool expect_waterbound = false;
-	bool isWater = false;
 
 	while (1) {
 
@@ -26,37 +25,14 @@ void BFS() {
 		pair<int, int> man_move = biber.front().first;
 		int cnt = biber.front().second;
 		biber.pop();
-		pair<int, int> water_move;
-		if (!water.empty()) {
-			water_move = water.front();
-			water.pop();
-			isWater = false;
-		}
-		else {
-			water_move = { NULL,NULL };
-			isWater = true;
-		}
-
-
-		for (int i = 0; i < R; i++) {
-			for (int j = 0; j < C; j++) {
-				cout << map[i][j] << " ";
-			}
-			cout << endl;
-		}
+		pair<int, int> water_move = water.front();
+		water.pop();
 	
 		for (int i = 0; i < 4; i++) {
-			pair<int, int> new_water_move;
-			if (isWater == false) {
-				new_water_move = { water_move.first + dir[i][0], water_move.second + dir[i][1] };
-			}
-			else {
-				new_water_move = { NULL,NULL };
-			}
+			pair<int, int> new_water_move = { water_move.first + dir[i][0], water_move.second + dir[i][1] };
 			if (new_water_move.first < 0 || new_water_move.first >= R || new_water_move.second < 0 || new_water_move.second >= C) continue;
-			if (isWater == false && map[new_water_move.first][new_water_move.second] == '.') {
+			if (map[new_water_move.first][new_water_move.second] == '.') {
 				water.push(new_water_move);
-				map_visited[new_water_move.first][new_water_move.second] = 1;
 				map[new_water_move.first][new_water_move.second] = '*';
 			}
 		}
@@ -69,13 +45,11 @@ void BFS() {
 			if (new_man_move.first < 0 || new_man_move.first >= R || new_man_move.second < 0 || new_man_move.second >= C) continue;
 			//물이 들어올 예정인칸 처리할 수 있는 로직 구현
 			expect_waterbound = false;
-			if (isWater == false) {
-				for (int z = 0; z < 4; z++) {
-					if ((new_man_move.first == new_water_move.first + dir[z][0]) && (new_man_move.second == new_water_move.second + dir[z][1]))
-					{
-						expect_waterbound = true;
-						break;
-					}
+			for (int z = 0; z < 4; z++) {
+				if ((new_man_move.first == new_water_move.first + dir[z][0]) && (new_man_move.second == new_water_move.second + dir[z][1]))
+				{
+					expect_waterbound = true;
+					break;
 				}
 			}
 			if (map[new_man_move.first][new_man_move.second] == '.'&& expect_waterbound == false) {
