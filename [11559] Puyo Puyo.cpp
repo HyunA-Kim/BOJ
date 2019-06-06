@@ -16,8 +16,32 @@ queue<pair<int, int>> yellow;
 queue<pair<int, int>> green;
 pair<int, int> first;
 
+queue<pair<int, int>> del;
 int dir[4][2] = { {-1,0},{1,0},{0,-1},{0,1} };
+int ans = 0;	//해당 뿌요 연쇄작용 횟수
 
+//맵초기화 함수
+void Inited() {
+
+}
+
+//해당 뿌요를 삭제했을 경우 테트리스가 밑으로 내려옴
+void Delete() {
+
+	for (int k = 0; k < del.size(); k++) {
+		int y = del.front().first;
+		int x = del.front().second;
+		del.pop();
+		for (int i = 0; i <y; i++) {
+			int temp = map[i][x];
+			map[i][x] = map[i - 1][x];
+			//위에것이 없을 떄 해야할 작용을 
+		}
+	}
+	
+}
+
+//해당 뿌요가 4개일 경우 del에 큐 저장
 void DFS(pair<int, int> first) {
 	
 	int cnt = 0;
@@ -30,7 +54,7 @@ void DFS(pair<int, int> first) {
 		if (new_y < 0 || new_y >= R || new_x < 0 || new_x >= C) continue;
 
 		if (map[new_y][new_x] == map[first.first][first.second]) {
-			cnt++;
+			DFS({ new_y,new_x });
 		}
 	}
 }
