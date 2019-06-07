@@ -10,80 +10,91 @@ int C = 6;
 vector<vector<char>> map;
 vector<vector<int>> map_visited;
 	
-queue<pair<int, int>> red;
-queue<pair<int, int>> blue;
-queue<pair<int, int>> yellow;
-queue<pair<int, int>> green;
-pair<int, int> first;
-
 queue<pair<int, int>> del;
-int dir[4][2] = { {-1,0},{1,0},{0,-1},{0,1} };
-int ans = 0;	//해당 뿌요 연쇄작용 횟수
-
-//맵초기화 함수
-void Inited() {
-
-}
-
+int dir[4][2] = { {-1,0},{0,-1},{0,1},{1,0} };
+int ans = 0;
 //해당 뿌요를 삭제했을 경우 테트리스가 밑으로 내려옴
 void Delete() {
-
-	for (int k = 0; k < del.size(); k++) {
+	while(!del.empty()){
 		int y = del.front().first;
 		int x = del.front().second;
 		del.pop();
-		for (int i = 0; i <y; i++) {
-			int temp = map[i][x];
+		for (int i = y; i > 0; i--){ 
 			map[i][x] = map[i - 1][x];
-			//위에것이 없을 떄 해야할 작용을 
 		}
+		map[0][x] = '.';
 	}
 	
 }
 
 //해당 뿌요가 4개일 경우 del에 큐 저장
-void DFS(pair<int, int> first) {
+bool DFS(pair<int, int> org, int cnt) {
 	
-	int cnt = 0;
+	if (cnt == 4) {
+		cnt = 0;
+		Delete();
+		return true;
+	}
 
 	for (int i = 0; i < 4; i++) {
 		
-		int new_y = first.first + dir[i][0];
-		int new_x = first.second + dir[i][1];
+		int new_y = org.first + dir[i][0];
+		int new_x = org.second + dir[i][1];
 		
 		if (new_y < 0 || new_y >= R || new_x < 0 || new_x >= C) continue;
 
-		if (map[new_y][new_x] == map[first.first][first.second]) {
-			DFS({ new_y,new_x });
+		if (map[new_y][new_x] == map[org.first][org.second] && map_visited[new_y][new_x]==0) {
+			del.push({ new_y,new_x });
+			map_visited[new_y][new_x] = 1;
+			DFS({ new_y,new_x },cnt+1);
 		}
 	}
+
+	return false;
+}
+
+bool map_checked() {
+	for (int i = 0; i < R; i++) {
+		for (int j = 0; j < C; j++) {
+			if (map[i][j] != '.' && map_visited[i][j]==0) {
+				del.push({ i,j });
+				map_visited[i][j] = 1;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 int main(void) {
-	map.assign(12, vector<char>(6, '.'));
-	map_visited.assign(12, vector<int>(6, 0));
+	
+	map.assign(R, vector<char>(C, '.'));
+	map_visited.assign(R, vector<int>(C, 0));
+	
 	for (int i = 0; i < R; i++) {
 		for (int j = 0; j < C; j++) {
-			cin >> map[R][C];
-			if (map[i][j] == 'R') {
-				red.push({ i,j });
-			}
-			else if (map[i][j] == 'Y') {
-				yellow.push({ i,j });
-				first = { i,j };
-			}
-			else if (map[i][j] == 'G') {
-				green.push({ i,j });
-			}
-			else if (map[i][j] == 'B') {
-				blue.push({ i,j });
-			}
-
-			if (map[i][j] != '.' && first != {NULL, NULL}) {
-				first = { i,j };
-			}
+			cin >> map[i][j];
 		}
 	}
 
-	DFS(first);
+
+	while (1) {
+		if (map_checked() == false) break;
+		if (DFS({ del.front().first, del.front().second }, 1) == true) {
+			map_visited.assign(R, vector<int>(C, 0));
+			ans++;
+		}
+		while (!del.empty()) {
+			del.pop();
+		}
+		for (int i = 0; i < R; i++) {
+			for (int j = 0; j < C; j++) {
+				cout << map[i][j] << " ";
+			}
+			cout << endl;
+		}
+		cout << endl;
+	}
+
+	cout << ans;
 }
