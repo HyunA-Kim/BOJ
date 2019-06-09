@@ -1,7 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<queue>
-
+#include<algorithm>
 using namespace std;
 
 int R = 12;
@@ -10,16 +10,20 @@ int C = 6;
 vector<vector<char>> map;
 vector<vector<int>> map_visited;
 	
-queue<pair<int, int>> del;
+vector<pair<int, int>> del;
 queue<pair<int, int>> save;
 int dir[4][2] = { {-1,0},{0,-1},{0,1},{1,0} };
 int ans = 0;
+int cnt = 0;
+
 //해당 뿌요를 삭제했을 경우 테트리스가 밑으로 내려옴
 void Delete() {
-	while(!del.empty()){
-		int y = del.front().first;
-		int x = del.front().second;
-		del.pop();
+
+	sort(del.begin(), del.end());
+
+	for(int i=0; i<del.size(); i++){
+		int y = del[i].first;
+		int x = del[i].second;
 		for (int i = y; i > 0; i--){ 
 			map[i][x] = map[i - 1][x];
 		}
@@ -29,10 +33,10 @@ void Delete() {
 }
 
 //해당 뿌요가 4개일 경우 del에 큐 저장
-bool DFS(pair<int, int> org, int cnt) {
+bool DFS(pair<int, int> org) {
 	
+	cnt++;
 	if (cnt == 4) {
-		cnt = 0;
 		return true;
 	}
 
@@ -46,25 +50,12 @@ bool DFS(pair<int, int> org, int cnt) {
 		if (map[new_y][new_x] == map[org.first][org.second] && map_visited[new_y][new_x]==0) {
 			save.push({ new_y,new_x });
 			map_visited[new_y][new_x] = 1;
-			if (DFS({ new_y,new_x }, cnt + 1) == true) {
+			if (DFS({ new_y,new_x }) == true) {
 				return true;
 			}
 		}
 	}
 
-	return false;
-}
-
-bool map_checked() {
-	for (int i = 0; i < R; i++) {
-		for (int j = 0; j < C; j++) {
-			if (map[i][j] != '.' && map_visited[i][j]==0) {
-				save.push({ i,j });
-				map_visited[i][j] = 1;
-				return true;
-			}
-		}
-	}
 	return false;
 }
 
@@ -85,9 +76,9 @@ int main(void) {
 				if (map[i][j] != '.' && map_visited[i][j] == 0) {
 					save.push({ i,j });
 					map_visited[i][j] = 1;
-					if (DFS({ i,j }, 1) == true) {
+					if (DFS({ i,j }) == true) {
 						while (!save.empty()) {
-							del.push(save.front());
+							del.push_back(save.front());
 							save.pop();
 						}
 					}
@@ -96,7 +87,7 @@ int main(void) {
 							save.pop();
 						}
 					}
-
+					cnt = 0;
 				}
 			}
 		}
@@ -109,6 +100,13 @@ int main(void) {
 		}
 		else {
 			break;
+		}
+
+		for (int i = 0; i < R; i++) {
+			for (int j = 0; j < C; j++) {
+				cout << map[i][j] << " ";
+			}
+			cout << endl;
 		}
 	}
 
