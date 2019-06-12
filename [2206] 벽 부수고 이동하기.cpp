@@ -17,6 +17,7 @@ queue<pair<int, int>> q;
 
 void BFS() {
 	int ans = 1;
+	bool isFinish = false;
 	q.push({ 0,0 });
 	
 	while (!q.empty()) {
@@ -33,11 +34,16 @@ void BFS() {
 				q.push({ new_y,new_x });
 				ans++;
 			}
+			if (new_y == N - 1 && new_x == M - 1 && q.front().first == new_y && q.front().second==new_x) {
+				if (minimum > ans) minimum = ans;
+				return;
+			}
 
 		}
+
 	}
 
-	if (minimum > ans) minimum = ans;
+	return;
 }
 int main(void) {
 	
@@ -48,16 +54,14 @@ int main(void) {
 
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
-			cin >> map[i][j];
+			scanf_s("%1d", &map[i][j],sizeof(map[i][j]));
 		}
 	}
 
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
 			map_visited.assign(N, vector<int>(M, 0));
-
 			if (map[i][j] == 1) {
-				crush++;
 				map[i][j] = 0;
 				BFS();
 				map[i][j] = 1;
