@@ -11,14 +11,13 @@ int minimum = 10000;
 int dir[4][2] = { {-1,0},{1,0},{0,-1},{0,1} };
 
 vector<vector<int>> map;
-vector<vector<int>> map_visited;
-
+int map_visited[100][100];
 queue<pair<pair<int, int>,int>> q;
 
 void BFS() {
 	int ans = 1;
 	bool isFind = false;
-	q.push({ 0,0 });
+	q.push({ { 0,0 },0 });
 	
 	while (!q.empty()) {
 		
@@ -38,7 +37,7 @@ void BFS() {
 				q.push({ {new_y,new_x},1 });
 			}
 			else if (map[new_y][new_x] == 0 && map_visited[new_y][new_x] == 0) {
-				map_visited[new_y][new_x] = 1;
+				map_visited[new_y][new_x] = map_visited[y][x] + 1;
 				q.push({{ new_y,new_x }, 0});
 				isFind = true;
 				if (new_y == N - 1 && new_x == M - 1 && q.front().first.first == new_y && q.front().first.second == new_x) {
@@ -61,7 +60,6 @@ int main(void) {
 	cin >> N >> M;
 
 	map.assign(N, vector<int>(M, 0));
-	map_visited.assign(N, vector<int>(M, 0));
 
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
@@ -69,17 +67,8 @@ int main(void) {
 		}
 	}
 
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
-			map_visited.assign(N, vector<int>(M, 0));
-			if (map[i][j] == 1) {
-				map[i][j] = 0;
-				BFS();
-				map[i][j] = 1;
-			}
+	BFS();
 
-		}
-	}
 	if (minimum == 10000) cout << -1;
 	else cout << minimum;
 }
