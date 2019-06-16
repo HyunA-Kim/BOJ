@@ -11,7 +11,7 @@ int minimum = 10000;
 int dir[4][2] = { {-1,0},{1,0},{0,-1},{0,1} };
 
 vector<vector<int>> map;
-int map_visited[100][100];
+int map_visited[100][100][2];
 queue<pair<pair<int, int>,int>> q;
 
 void BFS() {
@@ -33,26 +33,23 @@ void BFS() {
 			int new_y = y + dir[i][0];
 			int new_x = x + dir[i][1];
 			if (new_y < 0 || new_y >= N || new_x < 0 || new_x >= M) continue;
-			if (map[new_y][new_x] == 1 && wall == 0) {
-				q.push({ {new_y,new_x},1 });
+			if (map[new_y][new_x] == 1 && wall == 1) {
+				q.push({ {new_y,new_x},wall-1 });
 			}
-			else if (map[new_y][new_x] == 0 && map_visited[new_y][new_x] == 0) {
-				map_visited[new_y][new_x] = map_visited[y][x] + 1;
-				q.push({{ new_y,new_x }, 0});
+			else if (map[new_y][new_x] == 0 && map_visited[new_y][new_x][1] == 0) {
+				map_visited[new_y][new_x][wall] = map_visited[y][x][wall] + 1;
+				q.push({{ new_y,new_x }, wall});
 				isFind = true;
-				if (new_y == N - 1 && new_x == M - 1 && q.front().first.first == new_y && q.front().first.second == new_x) {
-					if (minimum > ans)
-					{
-						minimum = ans;
-						return;
-					}
+				if (new_y == N - 1 && new_x == M - 1) {
+					ans = map_visited[new_y][new_x][wall];
+					return;
 				}
 			}
 		
 		}
-		if(isFind==true) ans++;
 	}
 
+	ans = -1;
 	return;
 }
 int main(void) {
